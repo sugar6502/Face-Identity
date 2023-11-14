@@ -9,6 +9,17 @@ class detect_face:
 
         self.model = model.model()
     
+    
+    def extract_image(self,path,name):
+        face_cascade = cv2.CascadeClassifier('./haarcascade_frontalface_default.xml')
+        img = cv2.imread(path)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+        for (x,y,w,h) in faces:
+            new_img = img[y:y+h, x:x+w]
+            vector = self.model.extract(cv2.resize(new_img,(224,224)))
+        np.savetxt("./data/" +name,vector)
+    
     def detect(self):
         face_cascade = cv2.CascadeClassifier('./haarcascade_frontalface_default.xml')
         cap = cv2.VideoCapture(0)
@@ -27,12 +38,14 @@ class detect_face:
                 new_img = img[y:y+h, x:x+w]
                 vector = self.model.extract(cv2.resize(new_img,(224,224)))
 
-                compare = None
+                name = "unknow"
                 
                 score = 0
                 for i in sorted(glob.glob('./data/*')):
+                  
                     temp_score = np.dot(vector, np.loadtxt(i)) / (norm(vector) * norm(np.loadtxt(i)))
-                    if temp_score > score:
+                    print(temp_score)
+                    if temp_score > score and temp_score>0.7:
                         score = temp_score
                         name = str(i) + " " + str(score)
 
@@ -44,10 +57,13 @@ class detect_face:
 
             
             if cv2.waitKey(1) & 0xFF == 27:
-                if faces is not None:
+                if new_img is not None and name == "unknow":
                     person = input()
                     vector = self.model.extract(cv2.resize(new_img,(224,224)))
                     np.savetxt("./data/" +person,vector)
+                #break
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         cap.release()
         cv2.destroyAllWindows()
@@ -57,6 +73,7 @@ class detect_face:
 ######################################
 
 detect = detect_face()
+#detect.extract_image('./image/Khoa.jpg',"Khoa")
 detect.detect()
 
         

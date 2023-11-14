@@ -8,7 +8,7 @@ import numpy as np
 
 class model:
     def __init__(self):
-        vgg16_model = VGG16()
+        vgg16_model = VGG16(weights="imagenet")
         model = keras.Sequential()
 
         for layer in vgg16_model.layers[:-1]:
