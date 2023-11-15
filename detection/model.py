@@ -8,15 +8,18 @@ import numpy as np
 
 class model:
     def __init__(self):
-        vgg16_model = VGG16(weights="imagenet")
+        vgg16_model = VGG16(weights="imagenet",include_top=False)
         model = keras.Sequential()
 
-        for layer in vgg16_model.layers[:-1]:
-            model.add(layer)
+        # for layer in vgg16_model.layers[:-1]:
+        #     layer.trainable = False
+        #     model.add(layer)
 
-        model.layers.pop()
-
-        model.add(layers.Dense(2048, activation='softmax'))
+        # model.layers.pop()
+        #model.add(keras.layers.MaxPooling2D(pool_size=(2, 2),  strides=(2, 2), padding='valid'))
+        model.add(keras.layers.Flatten())
+        #model.add(layers.Dense(2048, activation='softmax'))
+        #model.add(layers.Dense(2048, activation='relu'))
         self.model = model
 
 
